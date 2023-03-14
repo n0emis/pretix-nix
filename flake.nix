@@ -6,10 +6,10 @@
     flake-utils.url = "github:numtide/flake-utils";
 
     #nixpkgs.url = "github:nixos/nixpkgs/master";
-    nixpkgs.url = "nixpkgs/nixos-21.11";
+    nixpkgs.url = "nixpkgs/nixos-22.11";
 
     pretixSrc = {
-      url = "github:n0emis/pretix/patch-stripe-name";
+      url = "github:pretix/pretix/v4.17.1";
       flake = false;
     };
   };
@@ -52,7 +52,7 @@
             sed -n -e '/install_requires/,/]/p' | head -n -1 | tail -n +2 | sed -e "s/',//g" -e "s/\s*'//g" -e 's/#.*//' -e 's/\([=<>]\)/@&/' | \
             xargs "$POETRY" add
 
-          poetry add gunicorn
+          poetry add gunicorn cryptography\<29.0.2
 
           cp ${pretixSrc}/src/pretix/static/npm_dir/{package.json,package-lock.json} ./
 
@@ -88,8 +88,12 @@
                 sha256 =
                   "sha256-lW9hHfZLkXCpLOvYQ/5tVrurYY2OAP1wPu6cIz6n0+I=";
               };
+              buildInputs = (a.buildInputs or [ ])
+                ++ [ psuper.setuptools ];
             });
             django-scopes = psuper.django-scopes.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
               # Django-scopes does something fishy to determine its version,
               # which breaks with Nix
               prePatch = (a.prePatch or "") + ''
@@ -99,25 +103,137 @@
 	    css-inline = psuper.css-inline.override {
               preferWheel = true;
             };
-	    django-hijack = psuper.django-hijack.overridePythonAttrs (a: {
+            django-hijack = psuper.django-hijack.overridePythonAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+                ++ [ psuper.setuptools-scm ];
               prePatch = (a.prePatch or "") + ''
                 sed -i 's|cmd = \["npm", "run", "build"\]|cmd = ["${prev.nodejs}/bin/node", "${prev.nodePackages.postcss}/lib/node_modules/postcss/package.json", "hijack/static/hijack/hijack.scss", "-o", "/hijack/static/hijack/hijack.min.css"]|' setup.py
                 sed -ie '/cmd = \["npm", "ci"\]/,+2d' setup.py
               '';
             });
+            defusedcsv = psuper.defusedcsv.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            pypdf2 = psuper.pypdf2.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.poetry psuper.flit-core ];
+            });
+            click-didyoumean = psuper.click-didyoumean.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.poetry ];
+            });
+            django-i18nfield = psuper.django-i18nfield.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            slimit = psuper.slimit.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.flit-scm ];
+            });
+            phonenumberslite = psuper.phonenumberslite.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            django-hierarkey = psuper.django-hierarkey.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            pyuca = psuper.pyuca.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            pypdf = psuper.pypdf.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.flit-core ];
+            });
+            static3 = psuper.static3.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            vat-moss-forked = psuper.vat-moss-forked.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            dj-static = psuper.dj-static.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            django-bootstrap3 = psuper.django-bootstrap3.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            django-jquery-js = psuper.django-jquery-js.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            django-localflavor = psuper.django-localflavor.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            django-markup = psuper.django-markup.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            django-mysql = psuper.django-mysql.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            django-phonenumber-field = psuper.django-phonenumber-field.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools-scm ];
+            });
+            django-formset-js-improved = psuper.django-formset-js-improved.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            drf-ujson2 = psuper.drf-ujson2.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            python-u2flib-server = psuper.python-u2flib-server.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            paypalhttp = psuper.paypalhttp.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            paypal-checkout-serversdk = psuper.paypal-checkout-serversdk.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+            django-libsass = psuper.django-libsass.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ psuper.setuptools ];
+            });
+
+            reportlab = let 
+              ft = prev.freetype.overrideAttrs (oldArgs: { dontDisableStatic = true; });
+            in psuper.reportlab.overrideAttrs (a: {
+              buildInputs = (a.buildInputs or [ ])
+              ++ [ ft ];
+
+              postPatch = ''
+                substituteInPlace setup.py \
+                  --replace "mif = findFile(d,'ft2build.h')" "mif = findFile('${final.lib.getDev ft}','ft2build.h')"
+              '';
+            });
+
             pretix = psuper.pretix.overrideAttrs (a: {
               buildInputs = (a.buildInputs or [ ])
               ++ [ prev.nodePackages.npm ];
             });
           });
           prePatch = ''
-            sed -i "/subprocess.check_call(\['npm', 'install'/d" setup.py
+            sed -i "/subprocess.check_call('npm install'/d" setup.py
           '';
           preBuild = ''
             mkdir -p pretix/static.dist/node_prefix/
             ln -s ${nodeDependencies}/lib/node_modules ./pretix/static.dist/node_prefix/node_modules
             export PATH="${nodeDependencies}/bin:$PATH"
           '';
+          doInstallCheck = false;
           nativeBuildInputs = [
             prev.nodePackages.npm
             nodeDependencies
